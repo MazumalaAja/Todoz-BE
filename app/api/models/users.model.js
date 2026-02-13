@@ -14,7 +14,7 @@ const usersModel = new mongoose.Schema({
      email: {
           type: String,
           required: [true, "The email column must be filled in"],
-          unique: [true, "The email column must be unique"],
+          unique: [true, "email already exist or has been used"],
           trim: true,
           validate: [validator.isEmail, "Invalid Email"],
      },
@@ -41,7 +41,6 @@ usersModel.pre("save", async function () {
      if (!this.isModified("password")) return;
      this.password = await hashData(this.password);
 });
-
 
 // Exports
 module.exports = mongoose.model("User", usersModel);
