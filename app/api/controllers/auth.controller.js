@@ -31,5 +31,18 @@ async function login(req, res, next) {
      }
 }
 
+async function verify(req, res, next) {
+     try {
+          const response = await authService.verify(req);
+          res.status(200).json({
+               status: "OK",
+               code: "200",
+               message: "VERIFICATION SUCCESSFULY"
+          })
+     } catch (err) {
+          return next(err);
+     }
+}
+
 // Exports
-module.exports = { register, login }
+module.exports = { register, login, verify }

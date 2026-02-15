@@ -2,7 +2,8 @@
 const usersModel = require("../api/models/users.model");
 const verificationsModel = require("../api/models/verifications.model");
 const { BadRequest, Conflict } = require("../errors");
-const { compareData } = require("../utils/bcrypt");
+const { Unauthorized } = require("../errors/unauthorized");
+const { compareData, hashData } = require("../utils/bcrypt");
 const generateOTP = require("../utils/generateOtp");
 const { createToken } = require("../utils/jsonwebtoken");
 const { sendEmail } = require("../utils/nodemailer");
@@ -63,6 +64,23 @@ const authService = {
           })
 
           return { token }
+     },
+     verify: async (req) => {
+          // Request body
+          const { otp } = req.body;
+          const verification = await verificationsModel.findOne({ email: req.user_email });
+          console.log(req.userEmail);
+
+          // validation
+          if (!otp) throw new BadRequest("all columns are required to be filled in");
+          if (!verification) throw new Unauthorized("Invalid authorization");
+          if (!await compareData(otp, verification.otp_hash)) throw new BadRequest("Invalid OTP")
+
+          // Update user status
+          await usersModel.findOneAndUpdate({ email: req.userEmail }, { is_Active: true });
+     },
+     sendOtp: async (req) => {
+
      }
 }
 
